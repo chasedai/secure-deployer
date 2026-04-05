@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-sidebar: #fbfbfd;
+  --bg-input: #f5f5f7;
+  --bg-hover: #f0f0f2;
+  --bg-code: #f5f5f7;
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary: #aeaeb2;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-light: #e8f2ff;
+  --success: #34c759;
+  --success-light: #eafbf0;
+  --warning: #ff9500;
+  --warning-light: #fff8ec;
+  --danger: #ff3b30;
+  --danger-light: #fff0ef;
+  --border: #d2d2d7;
+  --border-light: #e8e8ed;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+input, textarea, select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.15);
+}
+
+code, pre {
+  font-family: "SF Mono", "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
+.terminal-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #e0e0e0 !important;
+  caret-color: #34c759;
+  border-radius: 0 !important;
+  padding: 0.75rem 0.5rem !important;
+}
+.terminal-input:focus {
+  border: none !important;
+  box-shadow: none !important;
+}
+.terminal-input::placeholder {
+  color: #555 !important;
+}

@@ -1,0 +1,18 @@
+{
+  "name": "secure-deployer-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Secure Deployer server-side agent",
+  "author": "Chase Dai <chasedai@qq.com>",
+  "license": "CC-BY-NC-4.0",
+  "main": "src/index.mjs",
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dev": "node --watch src/index.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
+    "express-rate-limit": "^7.4.0"
+  }
+}
