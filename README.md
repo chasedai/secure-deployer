@@ -2,9 +2,9 @@
 
 # 🛡️ Secure Deployer
 
-**让 AI 帮你管服务器 — 安全的远程命令执行与管理工具**
+**Let AI manage your server — secure remote command execution & management tool**
 
-[English](./README_EN.md) | 简体中文
+English | [简体中文](./README_CN.md)
 
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -19,52 +19,52 @@
 
 ![Dashboard](./screenshots/dashboard.png)
 
-## 这是什么？
+## What is this?
 
-Secure Deployer 在你的远程服务器上运行一个轻量 HTTP 服务，让 AI 应用（Cursor、openClaw等）通过 HTTP API 帮你执行命令、管理文件、部署项目。
+Secure Deployer runs a lightweight HTTP service on your remote server, allowing AI applications (Cursor, openClaw etc.) to execute commands, manage files, and deploy projects via HTTP API.
 
-**解决的痛点：**
+**Problems it solves:**
 
-- AI 应用拒绝处理服务器密码或 SSH 连接 → Secure Deployer 提供 HTTP API，AI 能自如调用
-- VPN 导致 SSH 连接不稳定 → HTTP 短连接天然比 SSH 长连接更稳定
-- 不放心 AI 在服务器上乱搞 → 默认审批模式，每条命令都要你批准才执行
-- 非技术用户看不懂命令 → AI 提交命令时必须附带自然语言说明
+- AI applications refuse to handle server credentials or SSH connections → Secure Deployer provides an HTTP API that AI can call freely
+- VPN causes unstable SSH connections → HTTP short-lived connections are inherently more stable than SSH
+- Worried about AI messing up your server → Default approval mode requires your explicit approval for every command
+- Non-technical users can't understand shell commands → AI must provide a natural language description with every command
 
-## 核心特性
+## Key Features
 
-**🔒 安全第一**
-- 默认审批模式：AI 的每条命令都需要你在管理界面手动批准
-- AI 必须用自然语言说明每条命令的目的和风险
-- 危险命令自动拦截 + 实时告警通知（可配置黑名单）
-- 双端口隔离：AI API 和管理界面分开
+**🔒 Security First**
+- Default approval mode: every AI command requires manual approval in the dashboard
+- AI must describe the purpose and risks of every command in natural language
+- Dangerous commands are automatically blocked + real-time alert notifications (configurable blacklist)
+- Dual-port isolation: AI API and management dashboard on separate ports
 
 ![Security Alerts](./screenshots/block-commands.png)
 
-**⚡ 功能完善**
-- 命令执行（同步 + 流式输出）
-- 文件管理（浏览、编辑、上传、下载）
-- 系统监控（CPU / 内存 / 磁盘）
-- 操作历史记录 + 可视化统计
-- Skill 文档一键生成
+**⚡ Full Featured**
+- Command execution (synchronous + streaming output)
+- File management (browse, edit, upload, download)
+- System monitoring (CPU / memory / disk)
+- Operation history + visual statistics
+- One-click Skill document generation
 
 ![Skill Generator](./screenshots/skill-generator.png)
 
-**🌐 用户友好**
-- Web 可视化管理界面
-- 中英文双语支持
-- 一键安装脚本
-- 非技术用户也能轻松上手
+**🌐 User Friendly**
+- Web-based visual management dashboard
+- Bilingual interface (English / 中文)
+- One-click installation script
+- Easy enough for non-technical users
 
-## 快速开始
+## Quick Start
 
-### 服务器上安装
+### Install on Server
 
 ```bash
-# 一键安装（需要 root 权限）
+# One-click install (requires root)
 curl -fsSL https://raw.githubusercontent.com/chasedai/secure-deployer/main/scripts/install.sh | sudo bash
 ```
 
-或手动安装：
+Or install manually:
 
 ```bash
 git clone https://github.com/chasedai/secure-deployer.git
@@ -74,48 +74,48 @@ npm run build
 npm start
 ```
 
-### 使用步骤
+### Usage
 
-1. **打开管理界面**：浏览器访问 `http://你的服务器IP:9877`，设置管理密码
-2. **生成 Skill 文档**：进入「Skill 生成」页面，填入服务器地址，一键生成
-3. **给 AI 应用**：将文档提供给你使用的 AI 应用（openClaw、Cursor、Claude 等）
-4. **开始工作**：AI 根据文档自动调用 API，你在管理界面审批即可
+1. **Open the dashboard**: Visit `http://YOUR_SERVER_IP:9877` in your browser and set an admin password
+2. **Generate a Skill document**: Go to "Skill Gen" page, enter your server address, and click Generate
+3. **Provide it to your AI application**: openClaw, Cursor, Claude, or any AI application
+4. **Start working**: AI calls the API according to the document. You approve commands in the dashboard.
 
-## 架构
+## Architecture
 
 ![Architecture](./screenshots/architecture.jpg)
 
-**双端口设计：**
-- `9876`（AI API）：API Key 认证，供 AI 应用调用
-- `9877`（Dashboard）：密码认证，供人类管理
+**Dual-port design:**
+- `9876` (AI API): API Key authentication, for AI application access
+- `9877` (Dashboard): Password authentication, for human management
 
-## 两种执行模式
+## Two Execution Modes
 
-| | 审批模式（默认） | 直接执行模式 |
+| | Approval Mode (Default) | Auto-execute Mode |
 |---|---|---|
-| 安全性 | AI 命令需手动批准 | 命令立即执行 |
-| 适合 | 刚开始使用、不信任 AI 时 | 熟悉后、信任 AI 时 |
-| 切换方式 | 管理界面 → 设置 | 管理界面 → 设置 |
+| Security | AI commands require manual approval | Commands execute immediately |
+| Best for | Getting started, less trust in AI | Familiar workflow, trusted AI |
+| Switch via | Dashboard → Settings | Dashboard → Settings |
 
-## 管理界面
+## Dashboard
 
-- **概览**：服务器资源仪表盘 + 操作趋势图表
-- **审批中心**：审批 AI 提交的命令 + 安全告警通知
-- **终端**：手动执行命令
-- **文件管理**：浏览和编辑文件
-- **操作历史**：所有操作的时间线
-- **设置**：模式切换、API Key 管理、安全配置
-- **Skill 生成**：一键生成 AI 接入文档
+- **Overview**: Server resource dashboard with activity trend charts
+- **Approval Center**: Review AI-submitted commands + security alert notifications
+- **Terminal**: Execute commands manually
+- **File Manager**: Browse and edit files
+- **History**: Timeline of all operations
+- **Settings**: Mode switching, API Key management, security configuration
+- **Skill Gen**: One-click AI integration document generation
 
-## 技术栈
+## Tech Stack
 
-- **后端**：Node.js + Express
-- **前端**：React + TypeScript + Vite + TailwindCSS
-- **进程管理**：PM2
+- **Backend**: Node.js + Express
+- **Frontend**: React + TypeScript + Vite + TailwindCSS
+- **Process Management**: PM2
 
-## 配置
+## Configuration
 
-配置文件位于 `~/.secure-deployer/config.json`，可通过管理界面修改，也可直接编辑：
+Config file is located at `~/.secure-deployer/config.json`. You can modify it through the dashboard or edit directly:
 
 ```json
 {
@@ -127,18 +127,18 @@ npm start
 }
 ```
 
-## 安全建议
+## Security Recommendations
 
-1. 使用强密码保护管理界面
-2. 通过防火墙限制管理端口（9877）的访问 IP
-3. 初始阶段使用审批模式，熟悉后再考虑切换
-4. 定期查看操作历史
-5. 如有条件，配置 HTTPS（通过 nginx 反代）
+1. Use a strong password for the dashboard
+2. Restrict dashboard port (9877) access via firewall
+3. Start with approval mode; switch to auto-execute only after gaining confidence
+4. Review operation history regularly
+5. Consider setting up HTTPS via an nginx reverse proxy
 
-## 作者
+## Author
 
 **Chase Dai** — [GitHub](https://github.com/chasedai) · [Email](mailto:chasedai@qq.com)
 
 ## License
 
-[CC BY-NC 4.0](./LICENSE) — 可自由使用和修改，需保留作者署名，不可用于商业用途。
+[CC BY-NC 4.0](./LICENSE) — Free to use and modify with attribution. Not for commercial use.

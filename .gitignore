@@ -2,6 +2,7 @@ node_modules/
 dist/
 agent/public/
 test/
+screenshots/wxgzh.png
 .env
 *.log
 .DS_Store
