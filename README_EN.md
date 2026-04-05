@@ -21,11 +21,11 @@ English | [简体中文](./README.md)
 
 ## What is this?
 
-Secure Deployer runs a lightweight HTTP service on your remote server, allowing AI models (Cursor, Claude, ChatGPT, openClaw, etc.) to execute commands, manage files, and deploy projects via HTTP API.
+Secure Deployer runs a lightweight HTTP service on your remote server, allowing AI applications (Cursor, openClaw, Claude, ChatGPT, etc.) to execute commands, manage files, and deploy projects via HTTP API.
 
 **Problems it solves:**
 
-- AI models refuse to handle server credentials or SSH connections → Secure Deployer provides an HTTP API that AI can call freely
+- AI applications refuse to handle server credentials or SSH connections → Secure Deployer provides an HTTP API that AI can call freely
 - VPN causes unstable SSH connections → HTTP short-lived connections are inherently more stable than SSH
 - Worried about AI messing up your server → Default approval mode requires your explicit approval for every command
 - Non-technical users can't understand shell commands → AI must provide a natural language description with every command
@@ -78,24 +78,15 @@ npm start
 
 1. **Open the dashboard**: Visit `http://YOUR_SERVER_IP:9877` in your browser and set an admin password
 2. **Generate a Skill document**: Go to "Skill Gen" page, enter your server address, and click Generate
-3. **Provide it to your AI model**: openClaw, Cursor, Claude, or any AI model
+3. **Provide it to your AI application**: openClaw, Cursor, Claude, or any AI application
 4. **Start working**: AI calls the API according to the document. You approve commands in the dashboard.
 
 ## Architecture
 
-```
-Your Computer                      Remote Server
-┌───────────────┐                ┌──────────────────────────┐
-│  AI Model     │──HTTP:9876──→  │  Secure Deployer Agent   │
-│  (Cursor etc) │                │                          │
-│               │                │  Port 9876: AI API       │
-│  Browser      │──HTTP:9877──→  │  Port 9877: Dashboard    │
-│  (Dashboard)  │                │                          │
-└───────────────┘                └──────────────────────────┘
-```
+![Architecture](./screenshots/architecture.jpg)
 
 **Dual-port design:**
-- `9876` (AI API): API Key authentication, for AI model access
+- `9876` (AI API): API Key authentication, for AI application access
 - `9877` (Dashboard): Password authentication, for human management
 
 ## Two Execution Modes

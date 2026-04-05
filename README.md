@@ -21,11 +21,11 @@
 
 ## 这是什么？
 
-Secure Deployer 在你的远程服务器上运行一个轻量 HTTP 服务，让 AI 模型（Cursor、Claude、ChatGPT、openClaw 等）通过 HTTP API 帮你执行命令、管理文件、部署项目。
+Secure Deployer 在你的远程服务器上运行一个轻量 HTTP 服务，让 AI 应用（Cursor、openClaw、Claude、ChatGPT 等）通过 HTTP API 帮你执行命令、管理文件、部署项目。
 
 **解决的痛点：**
 
-- AI 模型拒绝处理服务器密码或 SSH 连接 → Secure Deployer 提供 HTTP API，AI 能自如调用
+- AI 应用拒绝处理服务器密码或 SSH 连接 → Secure Deployer 提供 HTTP API，AI 能自如调用
 - VPN 导致 SSH 连接不稳定 → HTTP 短连接天然比 SSH 长连接更稳定
 - 不放心 AI 在服务器上乱搞 → 默认审批模式，每条命令都要你批准才执行
 - 非技术用户看不懂命令 → AI 提交命令时必须附带自然语言说明
@@ -78,24 +78,15 @@ npm start
 
 1. **打开管理界面**：浏览器访问 `http://你的服务器IP:9877`，设置管理密码
 2. **生成 Skill 文档**：进入「Skill 生成」页面，填入服务器地址，一键生成
-3. **给 AI 模型**：将文档提供给你的 AI 模型（openClaw、Cursor、Claude 等）
+3. **给 AI 应用**：将文档提供给你使用的 AI 应用（openClaw、Cursor、Claude 等）
 4. **开始工作**：AI 根据文档自动调用 API，你在管理界面审批即可
 
 ## 架构
 
-```
-你的电脑                           远程服务器
-┌───────────────┐                ┌──────────────────────────┐
-│  AI 模型      │──HTTP:9876──→  │  Secure Deployer Agent   │
-│  (Cursor等)   │                │                          │
-│               │                │  端口 9876: AI API       │
-│  浏览器       │──HTTP:9877──→  │  端口 9877: 管理界面     │
-│  (管理界面)   │                │                          │
-└───────────────┘                └──────────────────────────┘
-```
+![Architecture](./screenshots/architecture.jpg)
 
 **双端口设计：**
-- `9876`（AI API）：API Key 认证，供 AI 模型调用
+- `9876`（AI API）：API Key 认证，供 AI 应用调用
 - `9877`（Dashboard）：密码认证，供人类管理
 
 ## 两种执行模式
