@@ -21,7 +21,7 @@ English | [简体中文](./README.md)
 
 ## What is this?
 
-Secure Deployer runs a lightweight HTTP service on your remote server, allowing AI applications (Cursor, openClaw, Claude, ChatGPT, etc.) to execute commands, manage files, and deploy projects via HTTP API.
+Secure Deployer runs a lightweight HTTP service on your remote server, allowing AI applications (Cursor, openClaw etc.) to execute commands, manage files, and deploy projects via HTTP API.
 
 **Problems it solves:**
 

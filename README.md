@@ -21,7 +21,7 @@
 
 ## 这是什么？
 
-Secure Deployer 在你的远程服务器上运行一个轻量 HTTP 服务，让 AI 应用（Cursor、openClaw、Claude、ChatGPT 等）通过 HTTP API 帮你执行命令、管理文件、部署项目。
+Secure Deployer 在你的远程服务器上运行一个轻量 HTTP 服务，让 AI 应用（Cursor、openClaw等）通过 HTTP API 帮你执行命令、管理文件、部署项目。
 
 **解决的痛点：**
 
