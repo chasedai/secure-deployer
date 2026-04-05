@@ -21,12 +21,12 @@
 
 ## 这是什么？
 
-Secure Deployer 在你的远程服务器上运行一个轻量 HTTP 服务，让 AI 应用（Cursor、openClaw等）通过 HTTP API 帮你执行命令、管理文件、部署项目。
+Secure Deployer 在你的远程服务器上运行一个轻量服务，让 AI 应用（Cursor、openClaw等）能够帮你执行命令、管理文件、部署项目。
 
 **解决的痛点：**
 
-- AI 应用拒绝处理服务器密码或 SSH 连接 → Secure Deployer 提供 HTTP API，AI 能自如调用
-- VPN 导致 SSH 连接不稳定 → HTTP 短连接天然比 SSH 长连接更稳定
+- AI 应用拒绝处理服务器密码或 SSH 连接 → Secure Deployer 帮你打通，让 AI 能自如操作服务器
+- VPN 导致 SSH 连接不稳定 → Secure Deployer 采用短连接通信，天然比 SSH 更稳定
 - 不放心 AI 在服务器上乱搞 → 默认审批模式，每条命令都要你批准才执行
 - 非技术用户看不懂命令 → AI 提交命令时必须附带自然语言说明
 

@@ -21,12 +21,12 @@ English | [简体中文](./README_CN.md)
 
 ## What is this?
 
-Secure Deployer runs a lightweight HTTP service on your remote server, allowing AI applications (Cursor, openClaw etc.) to execute commands, manage files, and deploy projects via HTTP API.
+Secure Deployer runs a lightweight service on your remote server, enabling AI applications (Cursor, openClaw etc.) to execute commands, manage files, and deploy projects on your behalf.
 
 **Problems it solves:**
 
-- AI applications refuse to handle server credentials or SSH connections → Secure Deployer provides an HTTP API that AI can call freely
-- VPN causes unstable SSH connections → HTTP short-lived connections are inherently more stable than SSH
+- AI applications refuse to handle server credentials or SSH connections → Secure Deployer bridges the gap so AI can operate your server freely
+- VPN causes unstable SSH connections → Secure Deployer uses short-lived connections that are inherently more stable
 - Worried about AI messing up your server → Default approval mode requires your explicit approval for every command
 - Non-technical users can't understand shell commands → AI must provide a natural language description with every command
 
