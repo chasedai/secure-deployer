@@ -9,43 +9,28 @@ import FileManager from "./pages/FileManager";
 import HistoryPage from "./pages/History";
 import SettingsPage from "./pages/Settings";
 import SkillGen from "./pages/SkillGen";
-import { authCheck, connectSSE, getPendingTasks, getUnreadAlertCount, type Task } from "./lib/api";
+import ServerManage from "./pages/ServerManage";
+import { authCheck, getPendingTasks, getUnreadAlertCount, connectSSE, type Task } from "./lib/api";
+import { ServerProvider, useServer } from "./lib/serverContext";
 import { useI18n } from "./lib/i18n";
 
 type AuthState = "loading" | "needs_setup" | "needs_login" | "authenticated";
 
-export default function App() {
+function AuthenticatedApp() {
   const { t } = useI18n();
-  const [authState, setAuthState] = useState<AuthState>("loading");
+  const { selectedId } = useServer();
   const [pendingCount, setPendingCount] = useState(0);
   const [alertCount, setAlertCount] = useState(0);
 
-  const checkAuth = useCallback(async () => {
-    try {
-      const { passwordSet } = await authCheck();
-      if (!passwordSet) {
-        setAuthState("needs_setup");
-      } else {
-        try {
-          const { tasks } = await getPendingTasks();
-          setPendingCount(tasks.length);
-          const { unread } = await getUnreadAlertCount();
-          setAlertCount(unread);
-          setAuthState("authenticated");
-        } catch {
-          setAuthState("needs_login");
-        }
-      }
-    } catch {
-      setAuthState("needs_login");
-    }
-  }, []);
-
-  useEffect(() => { checkAuth(); }, [checkAuth]);
+  useEffect(() => {
+    if (!selectedId) return;
+    getPendingTasks(selectedId).then(({ tasks }) => setPendingCount(tasks.length)).catch(() => setPendingCount(0));
+    getUnreadAlertCount(selectedId).then(({ unread }) => setAlertCount(unread)).catch(() => setAlertCount(0));
+  }, [selectedId]);
 
   useEffect(() => {
-    if (authState !== "authenticated") return;
-    const es = connectSSE((event, data) => {
+    if (!selectedId) return;
+    const es = connectSSE(selectedId, (event, data) => {
       if (event === "new_task") setPendingCount((c) => c + 1);
       if (event === "task_updated") {
         const task = data as Task;
@@ -54,21 +39,7 @@ export default function App() {
       if (event === "command_blocked") setAlertCount((c) => c + 1);
     });
     return () => es.close();
-  }, [authState]);
-
-  if (authState === "loading") {
-    return <div className="flex items-center justify-center h-screen"><div className="text-lg" style={{ color: "var(--text-secondary)" }}>{t("common.loading")}</div></div>;
-  }
-
-  if (authState === "needs_setup" || authState === "needs_login") {
-    return (
-      <Login mode={authState === "needs_setup" ? "setup" : "login"} onSuccess={() => {
-        setAuthState("authenticated");
-        getPendingTasks().then(({ tasks }) => setPendingCount(tasks.length)).catch(() => {});
-        getUnreadAlertCount().then(({ unread }) => setAlertCount(unread)).catch(() => {});
-      }} />
-    );
-  }
+  }, [selectedId]);
 
   return (
     <Routes>
@@ -80,8 +51,41 @@ export default function App() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/skill" element={<SkillGen />} />
+        <Route path="/servers" element={<ServerManage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
+  );
+}
+
+export default function App() {
+  const { t } = useI18n();
+  const [authState, setAuthState] = useState<AuthState>("loading");
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const { passwordSet } = await authCheck();
+      if (!passwordSet) { setAuthState("needs_setup"); return; }
+      try {
+        await authCheck();
+        setAuthState("authenticated");
+      } catch { setAuthState("needs_login"); }
+    } catch { setAuthState("needs_login"); }
+  }, []);
+
+  useEffect(() => { checkAuth(); }, [checkAuth]);
+
+  if (authState === "loading") {
+    return <div className="flex items-center justify-center h-screen"><div className="text-lg" style={{ color: "var(--text-secondary)" }}>{t("common.loading")}</div></div>;
+  }
+
+  if (authState === "needs_setup" || authState === "needs_login") {
+    return <Login mode={authState === "needs_setup" ? "setup" : "login"} onSuccess={() => setAuthState("authenticated")} />;
+  }
+
+  return (
+    <ServerProvider>
+      <AuthenticatedApp />
+    </ServerProvider>
   );
 }

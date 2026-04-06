@@ -4,6 +4,10 @@ export function generateApiKey() {
   return "sk-" + randomBytes(24).toString("hex");
 }
 
+export function generateManagementSecret() {
+  return "ms-" + randomBytes(24).toString("hex");
+}
+
 export function generateSessionToken() {
   return randomBytes(32).toString("hex");
 }

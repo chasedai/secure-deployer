@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/dash": "http://localhost:9877",
+      "/local": "http://localhost:9877",
     },
   },
   build: {

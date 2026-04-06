@@ -2,7 +2,7 @@
 
 # 🛡️ Secure Deployer
 
-**让 AI 帮你管服务器 — 安全的远程命令执行与管理工具**
+**让 AI 管理你的服务器 — 安全的远程命令执行与管理平台**
 
 [English](./README.md) | 简体中文
 
@@ -11,134 +11,183 @@
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-blue)]()
-[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen)]()
+[![Version](https://img.shields.io/badge/Version-2.0.0-brightgreen)]()
 
 </div>
 
 ---
 
-![Dashboard](./screenshots/dashboard.png)
-
 ## 这是什么？
 
-Secure Deployer 在你的远程服务器上运行一个轻量服务，让 AI 应用（Cursor、openClaw等）能够帮你执行命令、管理文件、部署项目。
+Secure Deployer 在 AI 应用和你的服务器之间架起桥梁。轻量级 **Agent** 运行在每台远程服务器上；本地 **Client** 提供统一的管理界面，一处管理所有服务器。
 
-**解决的痛点：**
+**它解决的问题：**
 
-- AI 应用拒绝处理服务器密码或 SSH 连接 → Secure Deployer 帮你打通，让 AI 能自如操作服务器
-- VPN 导致 SSH 连接不稳定 → Secure Deployer 采用短连接通信，天然比 SSH 更稳定
-- 不放心 AI 在服务器上乱搞 → 默认审批模式，每条命令都要你批准才执行
-- 非技术用户看不懂命令 → AI 提交命令时必须附带自然语言说明
+- AI 应用拒绝处理服务器凭据 → Agent 为 AI 提供安全的 HTTP API 来操作服务器
+- 多服务器管理太麻烦 → 一个 Dashboard 管理所有
+- 担心 AI 搞坏服务器 → 默认审批模式，每条命令都需要你手动批准
+- 不懂技术的用户看不懂命令 → AI 必须为每条命令提供自然语言解释
+
+## 架构
+
+```
+┌────────────────────────────────────────────────────────┐
+│  你的电脑（本地 Client）                                  │
+│  ┌──────────┐ ┌─────────────────────────────────────┐  │
+│  │Dashboard │ │ 本地 API    /local/*                 │  │
+│  │(React)   │→│ • 服务器管理 • 审批代理               │  │
+│  │:9877     │ │ • SSE 聚合  • Skill 生成             │  │
+│  └──────────┘ └──────┬────────────────┬──────────────┘  │
+└──────────────────────┼────────────────┼─────────────────┘
+                       │ HTTP           │ HTTP
+          ┌────────────▼──┐    ┌───────▼────────┐
+          │ 远程 Agent A   │    │ 远程 Agent B    │
+          │ :9876          │    │ :9876           │
+          │ /api/* (AI)    │    │ /api/* (AI)     │
+          │ /manage/*      │    │ /manage/*       │
+          └────────────────┘    └─────────────────┘
+```
+
+- **Agent**（远程服务器）：轻量级进程。执行命令、管理文件、监控系统。双 API 层：`/api/*` 给 AI（API Key），`/manage/*` 给 Client（Management Secret）。
+- **Client**（你的电脑）：Dashboard + 聚合层。管理多个 Agent，代理审批/历史/告警，生成统一的 Skill 文档。
 
 ## 核心特性
 
-**🔒 安全第一**
-- 默认审批模式：AI 的每条命令都需要你在管理界面手动批准
+**🔒 安全优先**
+- 默认审批模式：AI 的每条命令都需要手动批准
 - AI 必须用自然语言说明每条命令的目的和风险
-- 危险命令自动拦截 + 实时告警通知（可配置黑名单）
-- 双端口隔离：AI API 和管理界面分开
+- 危险命令自动拦截，实时告警通知
+- 双密钥隔离：API Key 给 AI，Management Secret 给 Client
 
-![Security Alerts](./screenshots/block-commands.png)
+**⚡ 多服务器管理**
+- 在同一个界面添加/移除服务器
+- 服务器健康状态一目了然
+- 统一的 Skill 文档涵盖所有服务器和项目
+- 无缝切换服务器
 
-**⚡ 功能完善**
-- 命令执行（同步 + 流式输出）
-- 文件管理（浏览、编辑、上传、下载）
+**🛠️ 功能完整**
+- 命令执行，流式输出
+- 文件浏览器，内置编辑器
 - 系统监控（CPU / 内存 / 磁盘）
-- 操作历史记录 + 可视化统计
-- Skill 文档一键生成
+- 操作历史，可视化统计
+- Web 终端，手动执行命令
 
-![Skill Generator](./screenshots/skill-generator.png)
-
-**🌐 用户友好**
-- Web 可视化管理界面
-- 中英文双语支持
-- 一键安装脚本
-- 非技术用户也能轻松上手
+**🌐 易于使用**
+- 可视化 Web 管理界面
+- 中英双语
+- Agent 和 Client 均提供简洁 CLI
 
 ## 快速开始
 
-### 服务器上安装
-
-```bash
-# 一键安装（需要 root 权限）
-curl -fsSL https://raw.githubusercontent.com/chasedai/secure-deployer/main/scripts/install.sh | sudo bash
-```
-
-或手动安装：
+### 1. 在远程服务器上安装 Agent
 
 ```bash
 git clone https://github.com/chasedai/secure-deployer.git
 cd secure-deployer
 npm install
-npm run build
-npm start
+node agent/bin/cli.mjs
 ```
 
-### 使用步骤
+首次运行时，Agent 会打印凭据：
 
-1. **打开管理界面**：浏览器访问 `http://你的服务器IP:9877`，设置管理密码
-2. **生成 Skill 文档**：进入「Skill 生成」页面，填入服务器地址，一键生成
-3. **给 AI 应用**：将文档提供给你使用的 AI 应用（openClaw、Cursor、Claude 等）
-4. **开始工作**：AI 根据文档自动调用 API，你在管理界面审批即可
+```
+  ★ First run — save these credentials!
+  API Key:            sk-xxxxxxxx...
+  Management Secret:  ms-xxxxxxxx...
+```
 
-## 架构
+保存好这两个值 — 在 Client 端连接时需要用到。
 
-![Architecture](./screenshots/architecture.jpg)
+### 2. 在你的电脑上运行 Client
 
-**双端口设计：**
-- `9876`（AI API）：API Key 认证，供 AI 应用调用
-- `9877`（Dashboard）：密码认证，供人类管理
+```bash
+npm run build   # 构建 Dashboard
+node client/bin/cli.mjs
+```
+
+### 3. 连接
+
+1. 打开 `http://localhost:9877`，设置管理密码
+2. 进入 **服务器管理** → **添加服务器**
+3. 填入服务器地址和步骤 1 中获取的凭据
+4. 完成！所有功能现在都可以用了
+
+### 4. 生成 Skill，连接 AI
+
+1. 进入 **Skill 生成** → 点击 **生成**
+2. 下载 `SKILL.md` 文件
+3. 提供给你的 AI 应用（Cursor、openClaw、Claude 等）
+4. AI 按照文档调用 API；你在 Dashboard 中审批命令
+
+## CLI 参考
+
+### Agent
+
+```bash
+node agent/bin/cli.mjs                   # 启动 Agent（默认）
+node agent/bin/cli.mjs credentials       # 显示 API Key 和 Management Secret
+node agent/bin/cli.mjs rotate-keys       # 重新生成凭据
+node agent/bin/cli.mjs --port 8080       # 自定义端口
+node agent/bin/cli.mjs --help            # 帮助
+```
+
+### Client
+
+```bash
+node client/bin/cli.mjs                  # 启动 Client（默认端口 9877）
+node client/bin/cli.mjs --port 3000      # 自定义端口
+node client/bin/cli.mjs --help           # 帮助
+```
 
 ## 两种执行模式
 
 | | 审批模式（默认） | 直接执行模式 |
 |---|---|---|
-| 安全性 | AI 命令需手动批准 | 命令立即执行 |
-| 适合 | 刚开始使用、不信任 AI 时 | 熟悉后、信任 AI 时 |
-| 切换方式 | 管理界面 → 设置 | 管理界面 → 设置 |
+| 安全性 | AI 命令需要手动批准 | 命令立即执行 |
+| 适用场景 | 初次使用、不太信任 AI | 熟悉流程、信任 AI |
+| 切换方式 | Dashboard → 设置 | Dashboard → 设置 |
 
-## 管理界面
+## 配置
 
-- **概览**：服务器资源仪表盘 + 操作趋势图表
-- **审批中心**：审批 AI 提交的命令 + 安全告警通知
-- **终端**：手动执行命令
-- **文件管理**：浏览和编辑文件
-- **操作历史**：所有操作的时间线
-- **设置**：模式切换、API Key 管理、安全配置
-- **Skill 生成**：一键生成 AI 接入文档
+**Agent 配置**：`~/.secure-deployer/config.json`
+
+```json
+{
+  "apiPort": 9876,
+  "executionMode": "approval",
+  "commandBlacklist": ["rm -rf /", "shutdown", "reboot"],
+  "rateLimit": { "windowMs": 60000, "max": 60 }
+}
+```
+
+**Client 配置**：`~/.secure-deployer/client-config.json`
+
+```json
+{
+  "dashPort": 9877,
+  "servers": [
+    { "name": "prod", "host": "10.0.1.5", "port": 9876, "managementSecret": "ms-..." }
+  ]
+}
+```
 
 ## 技术栈
 
 - **后端**：Node.js + Express
 - **前端**：React + TypeScript + Vite + TailwindCSS
-- **进程管理**：PM2
-
-## 配置
-
-配置文件位于 `~/.secure-deployer/config.json`，可通过管理界面修改，也可直接编辑：
-
-```json
-{
-  "apiPort": 9876,
-  "dashPort": 9877,
-  "executionMode": "approval",
-  "commandBlacklist": ["rm -rf /", "shutdown", "reboot", "dd if=", "mkfs"],
-  "rateLimit": { "windowMs": 60000, "max": 60 }
-}
-```
 
 ## 安全建议
 
-1. 使用强密码保护管理界面
-2. 通过防火墙限制管理端口（9877）的访问 IP
-3. 初始阶段使用审批模式，熟悉后再考虑切换
+1. 使用强密码保护 Dashboard
+2. 用防火墙限制 Agent 端口访问 — 只允许你的 Client IP
+3. 先使用审批模式，熟悉后再切换到直接执行
 4. 定期查看操作历史
-5. 如有条件，配置 HTTPS（通过 nginx 反代）
+5. 定期使用 `agent rotate-keys` 轮换密钥
 
 ## 作者
 
 **Chase Dai** — [GitHub](https://github.com/chasedai) · [Email](mailto:chasedai@qq.com)
 
-## License
+## 许可证
 
-[CC BY-NC 4.0](./LICENSE) — 可自由使用和修改，需保留作者署名，不可用于商业用途。
+[CC BY-NC 4.0](./LICENSE) — 署名后可自由使用和修改，禁止商用。

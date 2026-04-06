@@ -1,7 +1,7 @@
 import { getConfig } from "../utils/config.mjs";
 
 export function apiAuth(req, res, next) {
-  if (req.path === "/api/health") return next();
+  if (req.path === "/health") return next();
 
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

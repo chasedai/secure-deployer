@@ -1,0 +1,19 @@
+{
+  "name": "secure-deployer",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Local management client for Secure Deployer — manage multiple remote agents from one dashboard",
+  "author": "Chase Dai <chasedai@qq.com> (https://github.com/chasedai)",
+  "license": "CC-BY-NC-4.0",
+  "bin": {
+    "secure-deployer": "./bin/cli.mjs"
+  },
+  "main": "src/server.mjs",
+  "scripts": {
+    "start": "node bin/cli.mjs",
+    "dev": "node --watch bin/cli.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

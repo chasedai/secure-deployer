@@ -1,6 +1,7 @@
 node_modules/
 dist/
 agent/public/
+client/public/
 test/
 screenshots/wxgzh.png
 .env

@@ -2,47 +2,13 @@ import { Router } from "express";
 import { cpus, totalmem, freemem, uptime as osUptime, hostname, platform, release, arch } from "node:os";
 import { execSync } from "node:child_process";
 import { getConfig, updateConfig } from "../utils/config.mjs";
-import { hashPassword, verifyPassword, generateApiKey } from "../utils/security.mjs";
-import { createSession, isPasswordSet } from "../middleware/dashAuth.mjs";
+import { generateApiKey } from "../utils/security.mjs";
 import { getPendingTasks, getAllTasks, approveTask, rejectTask, taskEvents } from "../services/taskQueue.mjs";
 import { getHistory, getStats, addHistoryEntry } from "../services/history.mjs";
-import { generateSkillDocument } from "../services/skillGen.mjs";
 import { executeCommandStream } from "../services/executor.mjs";
 import { getAlerts, getUnreadCount, markAlertsRead } from "../services/alertStore.mjs";
 
 const router = Router();
-
-router.get("/auth/check", (_req, res) => {
-  res.json({ passwordSet: isPasswordSet() });
-});
-
-router.post("/auth/setup", (req, res) => {
-  if (isPasswordSet()) {
-    return res.status(400).json({ error: "Password already set. Use settings to change." });
-  }
-  const { password } = req.body;
-  if (!password || password.length < 4) {
-    return res.status(400).json({ error: "Password must be at least 4 characters." });
-  }
-  updateConfig({ dashPasswordHash: hashPassword(password) });
-  const token = createSession();
-  res.setHeader("Set-Cookie", `sd_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`);
-  res.json({ ok: true });
-});
-
-router.post("/auth/login", (req, res) => {
-  const { password } = req.body;
-  const config = getConfig();
-  if (!config.dashPasswordHash) {
-    return res.status(400).json({ error: "Password not set yet. Use /dash/auth/setup." });
-  }
-  if (!verifyPassword(password, config.dashPasswordHash)) {
-    return res.status(401).json({ error: "Wrong password." });
-  }
-  const token = createSession();
-  res.setHeader("Set-Cookie", `sd_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`);
-  res.json({ ok: true });
-});
 
 router.get("/tasks/pending", (_req, res) => {
   res.json({ tasks: getPendingTasks() });
@@ -130,7 +96,6 @@ router.get("/config", (_req, res) => {
   res.json({
     executionMode: config.executionMode,
     apiPort: config.apiPort,
-    dashPort: config.dashPort,
     apiKey: config.apiKey,
     defaultCwd: config.defaultCwd,
     rateLimit: config.rateLimit,
@@ -155,19 +120,6 @@ router.post("/config/regenerate-key", (_req, res) => {
   const newKey = generateApiKey();
   updateConfig({ apiKey: newKey });
   res.json({ ok: true, apiKey: newKey });
-});
-
-router.post("/config/change-password", (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const config = getConfig();
-  if (config.dashPasswordHash && !verifyPassword(currentPassword, config.dashPasswordHash)) {
-    return res.status(401).json({ error: "Current password is wrong." });
-  }
-  if (!newPassword || newPassword.length < 4) {
-    return res.status(400).json({ error: "New password must be at least 4 characters." });
-  }
-  updateConfig({ dashPasswordHash: hashPassword(newPassword) });
-  res.json({ ok: true });
 });
 
 router.get("/system", (_req, res) => {
@@ -224,7 +176,7 @@ router.post("/terminal/exec", (req, res) => {
       addHistoryEntry({
         type: "exec",
         request: { cmd, cwd },
-        description: "Manual execution from Dashboard terminal",
+        description: "Manual execution from management client",
         status: "completed",
         result,
       });
@@ -236,12 +188,6 @@ router.post("/terminal/exec", (req, res) => {
   res.on("close", () => {
     if (child && !child.killed) child.kill("SIGTERM");
   });
-});
-
-router.post("/skill/generate", (req, res) => {
-  const { serverAddress, extraNotes, lang } = req.body;
-  const markdown = generateSkillDocument({ serverAddress, extraNotes, lang });
-  res.json({ markdown });
 });
 
 export default router;

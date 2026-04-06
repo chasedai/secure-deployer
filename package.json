@@ -1,6 +1,6 @@
 {
   "name": "secure-deployer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "description": "Let AI manage your server — secure remote command execution & management tool",
   "author": "Chase Dai <chasedai@qq.com> (https://github.com/chasedai)",
@@ -9,12 +9,14 @@
     "type": "git",
     "url": "https://github.com/chasedai/secure-deployer.git"
   },
-  "workspaces": ["agent", "dashboard"],
+  "workspaces": ["agent", "client", "dashboard"],
   "scripts": {
     "dev:agent": "npm run dev -w agent",
+    "dev:client": "npm run dev -w client",
     "dev:dash": "npm run dev -w dashboard",
     "build:dash": "npm run build -w dashboard",
-    "build": "npm run build:dash && mkdir -p agent/public && cp -r dashboard/dist/* agent/public/",
-    "start": "npm start -w agent"
+    "build": "npm run build:dash && mkdir -p client/public && cp -r dashboard/dist/* client/public/",
+    "start:agent": "npm start -w agent",
+    "start": "npm start -w client"
   }
 }

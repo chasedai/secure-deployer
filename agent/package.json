@@ -2,13 +2,16 @@
   "name": "secure-deployer-agent",
   "version": "1.0.0",
   "type": "module",
-  "description": "Secure Deployer server-side agent",
-  "author": "Chase Dai <chasedai@qq.com>",
+  "description": "Lightweight remote agent for Secure Deployer — execute commands, manage files, and monitor servers",
+  "author": "Chase Dai <chasedai@qq.com> (https://github.com/chasedai)",
   "license": "CC-BY-NC-4.0",
-  "main": "src/index.mjs",
+  "bin": {
+    "secure-deployer-agent": "./bin/cli.mjs"
+  },
+  "main": "src/server.mjs",
   "scripts": {
-    "start": "node src/index.mjs",
-    "dev": "node --watch src/index.mjs"
+    "start": "node bin/cli.mjs",
+    "dev": "node --watch bin/cli.mjs"
   },
   "dependencies": {
     "express": "^4.21.0",

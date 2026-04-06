@@ -2,7 +2,7 @@
 
 # 🛡️ Secure Deployer
 
-**Let AI manage your server — secure remote command execution & management tool**
+**Let AI manage your servers — secure remote command execution & management platform**
 
 English | [简体中文](./README_CN.md)
 
@@ -11,83 +11,134 @@ English | [简体中文](./README_CN.md)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-blue)]()
-[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen)]()
+[![Version](https://img.shields.io/badge/Version-2.0.0-brightgreen)]()
 
 </div>
 
 ---
 
-![Dashboard](./screenshots/dashboard.png)
-
 ## What is this?
 
-Secure Deployer runs a lightweight service on your remote server, enabling AI applications (Cursor, openClaw etc.) to execute commands, manage files, and deploy projects on your behalf.
+Secure Deployer bridges the gap between AI applications and your servers. A lightweight **Agent** runs on each remote server; a local **Client** provides a unified dashboard to manage all servers from one place.
 
 **Problems it solves:**
 
-- AI applications refuse to handle server credentials or SSH connections → Secure Deployer bridges the gap so AI can operate your server freely
-- VPN causes unstable SSH connections → Secure Deployer uses short-lived connections that are inherently more stable
+- AI applications refuse to handle server credentials → Agent provides a secure HTTP API for AI to operate your server
+- Managing multiple servers is painful → One dashboard to rule them all
 - Worried about AI messing up your server → Default approval mode requires your explicit approval for every command
-- Non-technical users can't understand shell commands → AI must provide a natural language description with every command
+- Non-technical users can't understand shell commands → AI must provide a natural language explanation for every command
+
+## Architecture
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Your Machine (Local Client)                           │
+│  ┌──────────┐ ┌─────────────────────────────────────┐  │
+│  │Dashboard │ │ Local API   /local/*                 │  │
+│  │(React)   │→│ • Server CRUD • Approval proxy      │  │
+│  │:9877     │ │ • SSE aggregation • Skill generation │  │
+│  └──────────┘ └──────┬────────────────┬──────────────┘  │
+└──────────────────────┼────────────────┼─────────────────┘
+                       │ HTTP           │ HTTP
+          ┌────────────▼──┐    ┌───────▼────────┐
+          │ Remote Agent A │    │ Remote Agent B  │
+          │ :9876          │    │ :9876           │
+          │ /api/* (AI)    │    │ /api/* (AI)     │
+          │ /manage/*      │    │ /manage/*       │
+          └────────────────┘    └─────────────────┘
+```
+
+- **Agent** (remote servers): Lightweight process. Executes commands, manages files, monitors system. Two API layers: `/api/*` for AI (API Key), `/manage/*` for the Client (Management Secret).
+- **Client** (your machine): Dashboard + aggregation layer. Manages multiple agents, proxies approval/history/alerts, generates a unified Skill document.
 
 ## Key Features
 
 **🔒 Security First**
-- Default approval mode: every AI command requires manual approval in the dashboard
+- Default approval mode: every AI command requires manual approval
 - AI must describe the purpose and risks of every command in natural language
-- Dangerous commands are automatically blocked + real-time alert notifications (configurable blacklist)
-- Dual-port isolation: AI API and management dashboard on separate ports
+- Dangerous commands are automatically blocked with real-time alerts
+- Dual-key isolation: API Key for AI, Management Secret for the Client
 
-![Security Alerts](./screenshots/block-commands.png)
+**⚡ Multi-Server Management**
+- Add/remove servers from one dashboard
+- Server health monitoring at a glance
+- Unified Skill document covers all servers and projects
+- Seamless server switching
 
-**⚡ Full Featured**
-- Command execution (synchronous + streaming output)
-- File management (browse, edit, upload, download)
+**🛠️ Full Featured**
+- Command execution with streaming output
+- File browser with inline editor
 - System monitoring (CPU / memory / disk)
-- Operation history + visual statistics
-- One-click Skill document generation
-
-![Skill Generator](./screenshots/skill-generator.png)
+- Operation history with visual statistics
+- Web terminal for manual commands
 
 **🌐 User Friendly**
 - Web-based visual management dashboard
 - Bilingual interface (English / 中文)
-- One-click installation script
-- Easy enough for non-technical users
+- Simple CLI for both Agent and Client
 
 ## Quick Start
 
-### Install on Server
+### 1. Install Agent on each remote server
 
 ```bash
-# One-click install (requires root)
-curl -fsSL https://raw.githubusercontent.com/chasedai/secure-deployer/main/scripts/install.sh | sudo bash
-```
-
-Or install manually:
-
-```bash
+# Clone and start
 git clone https://github.com/chasedai/secure-deployer.git
 cd secure-deployer
 npm install
-npm run build
-npm start
+node agent/bin/cli.mjs
 ```
 
-### Usage
+On first run, the Agent prints credentials:
 
-1. **Open the dashboard**: Visit `http://YOUR_SERVER_IP:9877` in your browser and set an admin password
-2. **Generate a Skill document**: Go to "Skill Gen" page, enter your server address, and click Generate
-3. **Provide it to your AI application**: openClaw, Cursor, Claude, or any AI application
-4. **Start working**: AI calls the API according to the document. You approve commands in the dashboard.
+```
+  ★ First run — save these credentials!
+  API Key:            sk-xxxxxxxx...
+  Management Secret:  ms-xxxxxxxx...
+```
 
-## Architecture
+Save both values — you'll need them to connect from the Client.
 
-![Architecture](./screenshots/architecture.jpg)
+### 2. Run Client on your machine
 
-**Dual-port design:**
-- `9876` (AI API): API Key authentication, for AI application access
-- `9877` (Dashboard): Password authentication, for human management
+```bash
+npm run build   # Build the dashboard
+node client/bin/cli.mjs
+```
+
+### 3. Connect
+
+1. Open `http://localhost:9877` and set an admin password
+2. Go to **Server Management** → **Add Server**
+3. Enter the server address and credentials from step 1
+4. That's it! All features are now available for this server
+
+### 4. Generate Skill & connect AI
+
+1. Go to **Skill Gen** → click **Generate**
+2. Download the `SKILL.md` file
+3. Provide it to your AI application (Cursor, openClaw, Claude, etc.)
+4. AI calls the API according to the document; you approve commands in the dashboard
+
+## CLI Reference
+
+### Agent
+
+```bash
+node agent/bin/cli.mjs                   # Start agent (default)
+node agent/bin/cli.mjs credentials       # Show API Key & Management Secret
+node agent/bin/cli.mjs rotate-keys       # Generate new credentials
+node agent/bin/cli.mjs --port 8080       # Custom port
+node agent/bin/cli.mjs --help            # Help
+```
+
+### Client
+
+```bash
+node client/bin/cli.mjs                  # Start client (default: port 9877)
+node client/bin/cli.mjs --port 3000      # Custom port
+node client/bin/cli.mjs --help           # Help
+```
 
 ## Two Execution Modes
 
@@ -97,43 +148,42 @@ npm start
 | Best for | Getting started, less trust in AI | Familiar workflow, trusted AI |
 | Switch via | Dashboard → Settings | Dashboard → Settings |
 
-## Dashboard
+## Configuration
 
-- **Overview**: Server resource dashboard with activity trend charts
-- **Approval Center**: Review AI-submitted commands + security alert notifications
-- **Terminal**: Execute commands manually
-- **File Manager**: Browse and edit files
-- **History**: Timeline of all operations
-- **Settings**: Mode switching, API Key management, security configuration
-- **Skill Gen**: One-click AI integration document generation
+**Agent config**: `~/.secure-deployer/config.json`
+
+```json
+{
+  "apiPort": 9876,
+  "executionMode": "approval",
+  "commandBlacklist": ["rm -rf /", "shutdown", "reboot"],
+  "rateLimit": { "windowMs": 60000, "max": 60 }
+}
+```
+
+**Client config**: `~/.secure-deployer/client-config.json`
+
+```json
+{
+  "dashPort": 9877,
+  "servers": [
+    { "name": "prod", "host": "10.0.1.5", "port": 9876, "managementSecret": "ms-..." }
+  ]
+}
+```
 
 ## Tech Stack
 
 - **Backend**: Node.js + Express
 - **Frontend**: React + TypeScript + Vite + TailwindCSS
-- **Process Management**: PM2
-
-## Configuration
-
-Config file is located at `~/.secure-deployer/config.json`. You can modify it through the dashboard or edit directly:
-
-```json
-{
-  "apiPort": 9876,
-  "dashPort": 9877,
-  "executionMode": "approval",
-  "commandBlacklist": ["rm -rf /", "shutdown", "reboot", "dd if=", "mkfs"],
-  "rateLimit": { "windowMs": 60000, "max": 60 }
-}
-```
 
 ## Security Recommendations
 
-1. Use a strong password for the dashboard
-2. Restrict dashboard port (9877) access via firewall
-3. Start with approval mode; switch to auto-execute only after gaining confidence
+1. Use a strong dashboard password
+2. Restrict Agent port access with a firewall — only allow your Client IP
+3. Start with approval mode; switch to auto-execute after gaining confidence
 4. Review operation history regularly
-5. Consider setting up HTTPS via an nginx reverse proxy
+5. Rotate keys periodically with `agent rotate-keys`
 
 ## Author
 
