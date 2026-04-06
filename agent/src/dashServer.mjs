@@ -37,9 +37,9 @@ export function createDashServer() {
 
 function placeholderHtml() {
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head><meta charset="UTF-8"><title>Secure Deployer</title>
 <style>body{font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0f172a;color:#e2e8f0}
-.box{text-align:center;max-width:500px;padding:2rem}h1{font-size:1.5rem;margin-bottom:1rem}p{color:#94a3b8;line-height:1.6}</style></head>
-<body><div class="box"><h1>Secure Deployer</h1><p>Dashboard 尚未构建。请在项目根目录运行：<br><code style="background:#1e293b;padding:2px 8px;border-radius:4px">npm run build</code></p></div></body></html>`;
+.box{text-align:center;max-width:500px;padding:2rem}h1{font-size:1.5rem;margin-bottom:1rem}p{color:#94a3b8;line-height:1.6}code{background:#1e293b;padding:2px 8px;border-radius:4px}</style></head>
+<body><div class="box"><h1>Secure Deployer</h1><p>Dashboard not built yet. Run in project root:<br><code>npm run build</code></p></div></body></html>`;
 }

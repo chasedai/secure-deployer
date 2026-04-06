@@ -14,7 +14,7 @@
     "dev:agent": "npm run dev -w agent",
     "dev:dash": "npm run dev -w dashboard",
     "build:dash": "npm run build -w dashboard",
-    "build": "npm run build:dash && cp -r dashboard/dist/* agent/public/",
+    "build": "npm run build:dash && mkdir -p agent/public && cp -r dashboard/dist/* agent/public/",
     "start": "npm start -w agent"
   }
 }
