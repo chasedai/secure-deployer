@@ -54,12 +54,12 @@ export function getAllTasks({ limit = 50 } = {}) {
     .slice(0, limit);
 }
 
-export async function approveTask(id) {
+export function approveTask(id) {
   const task = tasks.get(id);
   if (!task || task.status !== "pending_approval") return null;
   task.status = "approved";
   taskEvents.emit("task_updated", task);
-  await runTask(task);
+  runTask(task).catch(() => {});
   return task;
 }
 

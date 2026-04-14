@@ -19,8 +19,8 @@ router.get("/tasks/all", (req, res) => {
   res.json({ tasks: getAllTasks({ limit }) });
 });
 
-router.post("/tasks/:taskId/approve", async (req, res) => {
-  const task = await approveTask(req.params.taskId);
+router.post("/tasks/:taskId/approve", (req, res) => {
+  const task = approveTask(req.params.taskId);
   if (!task) return res.status(404).json({ error: "Task not found or not pending." });
   res.json({ ok: true, task });
 });
