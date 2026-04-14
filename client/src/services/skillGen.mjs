@@ -50,6 +50,12 @@ ${serverBlock(servers, "zh")}
 3. 只读操作（查看文件、列目录、查系统信息）不需要审批，直接返回结果。
 4. 危险命令（如 \`rm -rf /\`）会被系统自动拦截。
 5. 根据任务对应的项目，选择正确的服务器和 API Key。
+6. **所有命令必须以非交互模式运行**。命令执行环境没有终端（非 TTY），无法响应交互式提示（如确认、输入密码等）。必须通过命令行参数跳过所有交互：
+   - 包管理器：\`yarn install --non-interactive\`、\`npm install\`（npm 默认非交互）、\`apt-get install -y\`
+   - 确认提示：使用 \`-y\`、\`--yes\`、\`--non-interactive\`、\`--no-input\` 等参数
+   - 密码输入：通过环境变量或配置文件传递，不要依赖 stdin
+   - 编辑器：设置 \`EDITOR=true\` 或使用 \`--no-edit\` 参数
+   - 如果不确定某个命令是否有交互提示，优先查阅其文档或使用 \`yes | command\` 管道
 
 ## API 接口
 
@@ -152,7 +158,8 @@ GET ${exampleBase}/api/health
 
 ## 注意事项
 
-- 执行命令默认超时 60 秒，最长 5 分钟。长时间命令请设置合适的 timeout。
+- 执行命令默认超时 60 秒，最长 5 分钟。长时间命令（如 \`npm install\`、\`build\`）请设置较大的 \`timeout\`，如 \`"timeout": 300000\`。
+- 如果任务返回 \`killed: true\`，说明命令超时被终止，请增大 timeout 或拆分命令重试。
 - 文件读取限制 5MB，更大的文件请用 download 接口。
 - 如果命令被拒绝，请根据 rejectReason 调整方案后重新提交。
 ${extraNotes ? `\n## 补充说明\n\n${extraNotes}\n` : ""}`;
@@ -186,6 +193,12 @@ ${serverBlock(servers, "en")}
 3. Read-only operations (list files, read files, system info) return results immediately.
 4. Dangerous commands (e.g. \`rm -rf /\`) are automatically blocked.
 5. Choose the correct server and API Key based on the project for each task.
+6. **All commands MUST run non-interactively**. The execution environment has no terminal (non-TTY) and cannot respond to interactive prompts. Always use flags to skip interaction:
+   - Package managers: \`yarn install --non-interactive\`, \`npm install\` (non-interactive by default), \`apt-get install -y\`
+   - Confirmations: use \`-y\`, \`--yes\`, \`--non-interactive\`, \`--no-input\` flags
+   - Password input: pass via environment variables or config files, never via stdin
+   - Editors: set \`EDITOR=true\` or use \`--no-edit\`
+   - When unsure if a command has interactive prompts, check its docs or pipe with \`yes | command\`
 
 ## API Endpoints
 
@@ -288,7 +301,8 @@ No authentication required.
 
 ## Notes
 
-- Default command timeout is 60 seconds, maximum 5 minutes.
+- Default command timeout is 60 seconds, maximum 5 minutes. For long-running commands (e.g. \`npm install\`, \`build\`), set a larger \`timeout\` like \`"timeout": 300000\`.
+- If the result contains \`killed: true\`, the command was terminated due to timeout. Increase timeout or split the command and retry.
 - File read is limited to 5MB. Use the download endpoint for larger files.
 - If a command is rejected, adjust your approach based on the rejectReason and resubmit.
 ${extraNotes ? `\n## Additional Notes\n\n${extraNotes}\n` : ""}`;
