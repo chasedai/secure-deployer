@@ -78,6 +78,15 @@ Secure Deployer bridges the gap between AI applications and your servers. A ligh
 - Bilingual interface (English / 中文)
 - Simple CLI for both Agent and Client
 
+## Branches
+
+| Branch | Version | Description |
+|---|---|---|
+| **`workgroup`** (default) | v2.x | **Current** — Client-Agent architecture, multi-server management |
+| `standalone` | v1.x | Legacy — monolithic single-machine version (maintained for compatibility only) |
+
+All new development happens on `workgroup`. `git clone` pulls this branch by default.
+
 ## Quick Start
 
 ### 1. Install Agent on each remote server

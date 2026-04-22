@@ -78,6 +78,15 @@ Secure Deployer 在 AI 应用和你的服务器之间架起桥梁。轻量级 **
 - 中英双语
 - Agent 和 Client 均提供简洁 CLI
 
+## 分支说明
+
+| 分支 | 版本 | 说明 |
+|---|---|---|
+| **`workgroup`**（默认） | v2.x | **当前版本** — Client-Agent 架构，支持多服务器管理 |
+| `standalone` | v1.x | 旧版 — 单机版（仅保留以兼容老用户） |
+
+所有新功能开发都在 `workgroup` 分支上，`git clone` 默认就是拉取此分支。
+
 ## 快速开始
 
 ### 1. 在远程服务器上安装 Agent
