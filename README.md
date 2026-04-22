@@ -67,6 +67,7 @@ Secure Deployer bridges the gap between AI applications and your servers. A ligh
 
 **🛠️ Full Featured**
 - Command execution with streaming output
+- Non-blocking approval: long-running commands (`npm install`, builds, etc.) run in background
 - File browser with inline editor
 - System monitoring (CPU / memory / disk)
 - Operation history with visual statistics
@@ -82,11 +83,10 @@ Secure Deployer bridges the gap between AI applications and your servers. A ligh
 ### 1. Install Agent on each remote server
 
 ```bash
-# Clone and start
 git clone https://github.com/chasedai/secure-deployer.git
 cd secure-deployer
 npm install
-node agent/bin/cli.mjs
+npm run start:agent
 ```
 
 On first run, the Agent prints credentials:
@@ -99,11 +99,18 @@ On first run, the Agent prints credentials:
 
 Save both values — you'll need them to connect from the Client.
 
+> **Tip:** For production, run the Agent under `pm2` or `systemd` so it survives reboots:
+> ```bash
+> pm2 start agent/bin/cli.mjs --name secure-deployer-agent
+> pm2 save && pm2 startup
+> ```
+
 ### 2. Run Client on your machine
 
 ```bash
+npm install
 npm run build   # Build the dashboard
-node client/bin/cli.mjs
+npm start       # Start the client on port 9877
 ```
 
 ### 3. Connect
@@ -120,12 +127,14 @@ node client/bin/cli.mjs
 3. Provide it to your AI application (Cursor, openClaw, Claude, etc.)
 4. AI calls the API according to the document; you approve commands in the dashboard
 
+The generated Skill covers all your registered servers and includes explicit guidance for AI to use **non-interactive flags** (`-y`, `--non-interactive`, etc.) and proper `timeout` values for long-running commands like `npm install` or `build`.
+
 ## CLI Reference
 
 ### Agent
 
 ```bash
-node agent/bin/cli.mjs                   # Start agent (default)
+npm run start:agent                      # Start agent (default)
 node agent/bin/cli.mjs credentials       # Show API Key & Management Secret
 node agent/bin/cli.mjs rotate-keys       # Generate new credentials
 node agent/bin/cli.mjs --port 8080       # Custom port
@@ -135,7 +144,7 @@ node agent/bin/cli.mjs --help            # Help
 ### Client
 
 ```bash
-node client/bin/cli.mjs                  # Start client (default: port 9877)
+npm start                                # Start client (default: port 9877)
 node client/bin/cli.mjs --port 3000      # Custom port
 node client/bin/cli.mjs --help           # Help
 ```

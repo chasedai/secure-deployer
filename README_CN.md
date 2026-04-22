@@ -67,6 +67,7 @@ Secure Deployer 在 AI 应用和你的服务器之间架起桥梁。轻量级 **
 
 **🛠️ 功能完整**
 - 命令执行，流式输出
+- 审批非阻塞：长耗时命令（`npm install`、构建等）在后台执行，不卡住 Dashboard
 - 文件浏览器，内置编辑器
 - 系统监控（CPU / 内存 / 磁盘）
 - 操作历史，可视化统计
@@ -85,7 +86,7 @@ Secure Deployer 在 AI 应用和你的服务器之间架起桥梁。轻量级 **
 git clone https://github.com/chasedai/secure-deployer.git
 cd secure-deployer
 npm install
-node agent/bin/cli.mjs
+npm run start:agent
 ```
 
 首次运行时，Agent 会打印凭据：
@@ -98,11 +99,18 @@ node agent/bin/cli.mjs
 
 保存好这两个值 — 在 Client 端连接时需要用到。
 
+> **提示：** 生产环境建议用 `pm2` 或 `systemd` 守护 Agent，保证开机自启：
+> ```bash
+> pm2 start agent/bin/cli.mjs --name secure-deployer-agent
+> pm2 save && pm2 startup
+> ```
+
 ### 2. 在你的电脑上运行 Client
 
 ```bash
+npm install
 npm run build   # 构建 Dashboard
-node client/bin/cli.mjs
+npm start       # 启动 Client（默认端口 9877）
 ```
 
 ### 3. 连接
@@ -119,12 +127,14 @@ node client/bin/cli.mjs
 3. 提供给你的 AI 应用（Cursor、openClaw、Claude 等）
 4. AI 按照文档调用 API；你在 Dashboard 中审批命令
 
+生成的 Skill 涵盖所有已注册的服务器，并明确指导 AI 使用**非交互式参数**（`-y`、`--non-interactive` 等），以及为 `npm install` 或构建等长耗时命令设置合理的 `timeout` 值。
+
 ## CLI 参考
 
 ### Agent
 
 ```bash
-node agent/bin/cli.mjs                   # 启动 Agent（默认）
+npm run start:agent                      # 启动 Agent（默认）
 node agent/bin/cli.mjs credentials       # 显示 API Key 和 Management Secret
 node agent/bin/cli.mjs rotate-keys       # 重新生成凭据
 node agent/bin/cli.mjs --port 8080       # 自定义端口
@@ -134,7 +144,7 @@ node agent/bin/cli.mjs --help            # 帮助
 ### Client
 
 ```bash
-node client/bin/cli.mjs                  # 启动 Client（默认端口 9877）
+npm start                                # 启动 Client（默认端口 9877）
 node client/bin/cli.mjs --port 3000      # 自定义端口
 node client/bin/cli.mjs --help           # 帮助
 ```
