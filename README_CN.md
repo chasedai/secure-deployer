@@ -110,11 +110,13 @@ npm run start:agent
 
 保存好这两个值 — 在 Client 端连接时需要用到。
 
-> **提示：** 生产环境建议用 `pm2` 或 `systemd` 守护 Agent，保证开机自启：
+> **提示：** 生产环境建议用 `pm2` 守护 Agent，保证开机自启：
 > ```bash
+> npm install -g pm2                                           # 第一次使用需要先全局安装 pm2
 > pm2 start agent/bin/cli.mjs --name secure-deployer-agent
-> pm2 save && pm2 startup
+> pm2 save && pm2 startup                                      # 按提示执行输出的 sudo 命令
 > ```
+> 常用命令：`pm2 logs secure-deployer-agent`（查日志）、`pm2 restart secure-deployer-agent`（重启）、`pm2 stop secure-deployer-agent`（停止）。
 
 ### 2. 在你的电脑上运行 Client
 

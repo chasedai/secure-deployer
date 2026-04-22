@@ -110,11 +110,13 @@ On first run, the Agent prints credentials:
 
 Save both values — you'll need them to connect from the Client.
 
-> **Tip:** For production, run the Agent under `pm2` or `systemd` so it survives reboots:
+> **Tip:** For production, run the Agent under `pm2` so it survives reboots:
 > ```bash
+> npm install -g pm2                                           # install pm2 (first time only)
 > pm2 start agent/bin/cli.mjs --name secure-deployer-agent
-> pm2 save && pm2 startup
+> pm2 save && pm2 startup                                      # follow the printed instruction
 > ```
+> Useful commands: `pm2 logs secure-deployer-agent`, `pm2 restart secure-deployer-agent`, `pm2 stop secure-deployer-agent`.
 
 ### 2. Run Client on your machine
 
