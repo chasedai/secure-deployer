@@ -70,7 +70,7 @@ export function connectSSE(sid: string, onEvent: (event: string, data: unknown) 
 }
 
 // Skill generation (local)
-export const generateSkill = (lang = "zh", extraNotes = "") => request<{ markdown: string }>("/skill/generate", { method: "POST", body: JSON.stringify({ lang, extraNotes }) });
+export const generateSkill = (serverId: string, lang = "zh", extraNotes = "") => request<{ markdown: string }>("/skill/generate", { method: "POST", body: JSON.stringify({ serverId, lang, extraNotes }) });
 
 // Types
 export interface Server {

@@ -402,9 +402,16 @@ router.get("/servers/:id/files/download", async (req, res) => {
 // --- Skill Generation ---
 
 router.post("/skill/generate", (req, res) => {
-  const { lang, extraNotes } = req.body;
-  const markdown = generateSkillDocument({ lang, extraNotes });
-  res.json({ markdown });
+  const { lang, extraNotes, serverId } = req.body;
+  if (!serverId) {
+    return res.status(400).json({ error: "serverId is required" });
+  }
+  try {
+    const markdown = generateSkillDocument({ lang, extraNotes, serverId });
+    res.json({ markdown });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 export default router;

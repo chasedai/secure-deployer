@@ -1,7 +1,15 @@
 import { getServers } from "./configStore.mjs";
 
-export function generateSkillDocument({ lang = "zh", extraNotes } = {}) {
-  const servers = getServers();
+export function generateSkillDocument({ lang = "zh", extraNotes, serverId } = {}) {
+  const allServers = getServers();
+  if (!serverId) {
+    throw new Error("serverId is required to generate a skill document");
+  }
+  const server = allServers.find((s) => s.id === serverId);
+  if (!server) {
+    throw new Error(`Server not found: ${serverId}`);
+  }
+  const servers = [server];
   if (lang === "en") return generateEN(servers, extraNotes);
   return generateZH(servers, extraNotes);
 }
@@ -15,10 +23,12 @@ function serverBlock(servers, lang) {
 
   return servers.map((s) => {
     const base = `http://${s.host}:${s.port}`;
+    const projectsLabel = lang === "en" ? "Projects" : "项目";
+    const noProjects = lang === "en" ? "(none configured)" : "（未配置）";
     const projects = s.projects?.length
       ? s.projects.map((p) => `  - ${p.name}${p.port ? ` (port ${p.port})` : ""}${p.description ? ` — ${p.description}` : ""}`).join("\n")
-      : lang === "en" ? "  - (no projects configured)" : "  - （未配置项目）";
-    return `### ${s.name} (${s.host}:${s.port})\n\n- **API**: \`${base}\`\n- **API Key**: \`${s.apiKey}\`\n- **Projects**:\n${projects}`;
+      : `  - ${noProjects}`;
+    return `- **${s.name}** (${s.host}:${s.port})\n- **API Base**: \`${base}\`\n- **API Key**: \`${s.apiKey}\`\n- **${projectsLabel}**:\n${projects}`;
   }).join("\n\n");
 }
 
@@ -37,9 +47,9 @@ description: 通过 HTTP API 操作远程服务器，支持命令执行、文件
 
 ## 概述
 
-你可以通过 HTTP API 操作远程服务器。根据任务涉及的项目，选择对应的服务器进行操作。
+你可以通过 HTTP API 操作下方的远程服务器。该 Skill 仅包含一台服务器的访问凭据，所有操作都应针对此服务器进行。
 
-## 服务器列表
+## 目标服务器
 
 ${serverBlock(servers, "zh")}
 
@@ -49,7 +59,7 @@ ${serverBlock(servers, "zh")}
 2. 写入操作（命令执行、文件写入、删除等）可能需要用户审批。提交后用 \`GET /api/tasks/:taskId\` 轮询任务状态获取执行结果。
 3. 只读操作（查看文件、列目录、查系统信息）不需要审批，直接返回结果。
 4. 危险命令（如 \`rm -rf /\`）会被系统自动拦截。
-5. 根据任务对应的项目，选择正确的服务器和 API Key。
+5. 本 Skill 只包含单台目标服务器的凭据。所有操作只对此服务器生效，不要尝试调用其他服务器。
 6. **所有命令必须以非交互模式运行**。命令执行环境没有终端（非 TTY），无法响应交互式提示（如确认、输入密码等）。必须通过命令行参数跳过所有交互：
    - 包管理器：\`yarn install --non-interactive\`、\`npm install\`（npm 默认非交互）、\`apt-get install -y\`
    - 确认提示：使用 \`-y\`、\`--yes\`、\`--non-interactive\`、\`--no-input\` 等参数
@@ -59,7 +69,7 @@ ${serverBlock(servers, "zh")}
 
 ## API 接口
 
-所有服务器共享相同的 API 格式。将下方示例中的地址和 Key 替换为目标服务器的信息。
+下方示例已填入目标服务器的地址和 API Key，可直接使用。
 
 ### 1. 执行命令
 
@@ -180,9 +190,9 @@ description: Operate remote servers via HTTP API. Supports command execution, fi
 
 ## Overview
 
-You can operate remote servers through HTTP API calls. Choose the correct server based on the project involved in each task.
+You can operate the remote server below through HTTP API calls. This skill contains credentials for one server only; all operations must target this specific server.
 
-## Servers
+## Target Server
 
 ${serverBlock(servers, "en")}
 
@@ -192,7 +202,7 @@ ${serverBlock(servers, "en")}
 2. Write operations (command execution, file write/delete) may require user approval. After submission, poll \`GET /api/tasks/:taskId\` for results.
 3. Read-only operations (list files, read files, system info) return results immediately.
 4. Dangerous commands (e.g. \`rm -rf /\`) are automatically blocked.
-5. Choose the correct server and API Key based on the project for each task.
+5. This skill contains credentials for a single target server only. All operations apply to this server; do not attempt to call other servers.
 6. **All commands MUST run non-interactively**. The execution environment has no terminal (non-TTY) and cannot respond to interactive prompts. Always use flags to skip interaction:
    - Package managers: \`yarn install --non-interactive\`, \`npm install\` (non-interactive by default), \`apt-get install -y\`
    - Confirmations: use \`-y\`, \`--yes\`, \`--non-interactive\`, \`--no-input\` flags
@@ -202,7 +212,7 @@ ${serverBlock(servers, "en")}
 
 ## API Endpoints
 
-All servers share the same API format. Replace the URL and Key below with the target server's info.
+The examples below are pre-filled with the target server's URL and API Key. You can use them directly.
 
 ### 1. Execute Command
 

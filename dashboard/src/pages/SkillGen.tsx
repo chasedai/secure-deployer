@@ -1,17 +1,34 @@
-import { useState } from "react";
-import { FileText, Copy, Download, Check, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, Copy, Download, Check, RefreshCw, Server } from "lucide-react";
 import { generateSkill } from "../lib/api";
 import { copyToClipboard } from "../lib/utils";
 import { useI18n } from "../lib/i18n";
+import { useServer } from "../lib/serverContext";
 
 export default function SkillGen() {
   const { t, lang } = useI18n();
+  const { selectedId, selected } = useServer();
   const [extraNotes, setExtraNotes] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleGenerate = async () => { setLoading(true); try { const { markdown: md } = await generateSkill(lang, extraNotes.trim()); setMarkdown(md); } catch {} finally { setLoading(false); } };
+  useEffect(() => { setMarkdown(""); }, [selectedId]);
+
+  const handleGenerate = async () => { if (!selectedId) return; setLoading(true); try { const { markdown: md } = await generateSkill(selectedId, lang, extraNotes.trim()); setMarkdown(md); } catch {} finally { setLoading(false); } };
+
+  if (!selectedId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <Server size={48} className="mx-auto mb-4" style={{ color: "var(--text-tertiary)", opacity: 0.3 }} />
+          <p className="text-lg font-medium" style={{ color: "var(--text-secondary)" }}>{t("servers.selectHint")}</p>
+          <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>{t("servers.selectHintLong")}</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleCopy = async () => { const ok = await copyToClipboard(markdown); if (ok) { setCopied(true); setTimeout(() => setCopied(false), 2000); } };
   const handleDownload = () => { const blob = new Blob([markdown], { type: "text/markdown" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "SKILL.md"; a.click(); URL.revokeObjectURL(url); };
 
@@ -23,6 +40,14 @@ export default function SkillGen() {
         <div className="space-y-5">
           <Card title={t("skill.config")}>
             <div className="space-y-4">
+              {selected && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs" style={{ background: "var(--bg-primary)", border: "1px solid var(--border-light)" }}>
+                  <Server size={13} style={{ color: "var(--accent)" }} />
+                  <span style={{ color: "var(--text-secondary)" }}>{lang === "zh" ? "生成范围：仅当前服务器" : "Scope: current server only"}</span>
+                  <span className="font-medium" style={{ color: "var(--text-primary)" }}>{selected.name}</span>
+                  <span style={{ color: "var(--text-tertiary)" }}>({selected.host}:{selected.port})</span>
+                </div>
+              )}
               <Field label={t("skill.extraNotes")}><textarea value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} rows={3} placeholder={t("skill.extraNotesPlaceholder")} className="w-full" /></Field>
               <button onClick={handleGenerate} disabled={loading} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-white cursor-pointer disabled:opacity-40" style={{ background: "var(--accent)" }}>{loading ? <RefreshCw size={15} className="animate-spin" /> : <FileText size={15} />}{loading ? t("skill.generating") : t("skill.generate")}</button>
             </div>
