@@ -89,6 +89,8 @@ All new development happens on `workgroup`. `git clone` pulls this branch by def
 
 ## Quick Start
 
+**Prerequisites:** Node.js **18 or newer** on both the remote server (for Agent) and your local machine (for Client). Check with `node --version`. If older, install the latest LTS from [nodejs.org](https://nodejs.org/) or use `nvm`.
+
 ### 1. Install Agent on each remote server
 
 ```bash

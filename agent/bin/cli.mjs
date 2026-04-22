@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+const [major] = process.versions.node.split(".").map(Number);
+if (major < 18) {
+  console.error(`\n  ✖ Node.js ${process.versions.node} is too old.`);
+  console.error("  Secure Deployer requires Node.js 18 or newer.");
+  console.error("  Install the latest LTS: https://nodejs.org/\n");
+  process.exit(1);
+}
+
 import { existsSync } from "node:fs";
 import { getConfigPath, initConfig, getConfig, updateConfig } from "../src/utils/config.mjs";
 import { generateApiKey, generateManagementSecret } from "../src/utils/security.mjs";
@@ -67,38 +75,45 @@ if (portOverride) updateConfig({ apiPort: parseInt(portOverride) });
 if (apiKeyOverride) updateConfig({ apiKey: apiKeyOverride });
 if (secretOverride) updateConfig({ managementSecret: secretOverride });
 
-const { initHistory } = await import("../src/services/history.mjs");
-const { createServer } = await import("../src/server.mjs");
+async function startServer() {
+  const { initHistory } = await import("../src/services/history.mjs");
+  const { createServer } = await import("../src/server.mjs");
 
-initHistory();
+  initHistory();
 
-const config = getConfig();
-const app = createServer();
+  const config = getConfig();
+  const app = createServer();
 
-app.listen(config.apiPort, "0.0.0.0", () => {
-  const w = 56;
-  console.log("");
-  console.log("=".repeat(w));
-  console.log("  Secure Deployer Agent v1.0.0");
-  console.log("=".repeat(w));
-  console.log(`  Port:               ${config.apiPort}`);
-  console.log(`  Mode:               ${config.executionMode === "approval" ? "Approval (commands need approval)" : "Auto-execute"}`);
-  console.log("-".repeat(w));
-  if (firstRun) {
-    console.log("  ★ First run — save these credentials!");
-    console.log("-".repeat(w));
-  }
-  console.log(`  API Key:            ${config.apiKey}`);
-  console.log(`  Management Secret:  ${config.managementSecret}`);
-  console.log("-".repeat(w));
-  console.log(`  AI API:             http://0.0.0.0:${config.apiPort}/api/*`);
-  console.log(`  Management API:     http://0.0.0.0:${config.apiPort}/manage/*`);
-  console.log(`  Config:             ${getConfigPath()}`);
-  console.log("=".repeat(w));
-  if (firstRun) {
+  app.listen(config.apiPort, "0.0.0.0", () => {
+    const w = 56;
     console.log("");
-    console.log("  Copy the API Key and Management Secret to your");
-    console.log("  local Secure Deployer client to connect.");
-  }
-  console.log("");
+    console.log("=".repeat(w));
+    console.log("  Secure Deployer Agent v1.0.0");
+    console.log("=".repeat(w));
+    console.log(`  Port:               ${config.apiPort}`);
+    console.log(`  Mode:               ${config.executionMode === "approval" ? "Approval (commands need approval)" : "Auto-execute"}`);
+    console.log("-".repeat(w));
+    if (firstRun) {
+      console.log("  ★ First run — save these credentials!");
+      console.log("-".repeat(w));
+    }
+    console.log(`  API Key:            ${config.apiKey}`);
+    console.log(`  Management Secret:  ${config.managementSecret}`);
+    console.log("-".repeat(w));
+    console.log(`  AI API:             http://0.0.0.0:${config.apiPort}/api/*`);
+    console.log(`  Management API:     http://0.0.0.0:${config.apiPort}/manage/*`);
+    console.log(`  Config:             ${getConfigPath()}`);
+    console.log("=".repeat(w));
+    if (firstRun) {
+      console.log("");
+      console.log("  Copy the API Key and Management Secret to your");
+      console.log("  local Secure Deployer client to connect.");
+    }
+    console.log("");
+  });
+}
+
+startServer().catch((err) => {
+  console.error("\n  ✖ Failed to start agent:", err.message);
+  process.exit(1);
 });

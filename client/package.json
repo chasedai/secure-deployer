@@ -9,6 +9,9 @@
     "secure-deployer": "./bin/cli.mjs"
   },
   "main": "src/server.mjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node bin/cli.mjs",
     "dev": "node --watch bin/cli.mjs"

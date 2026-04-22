@@ -10,6 +10,9 @@
     "url": "https://github.com/chasedai/secure-deployer.git"
   },
   "workspaces": ["agent", "client", "dashboard"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev:agent": "npm run dev -w agent",
     "dev:client": "npm run dev -w client",

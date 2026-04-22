@@ -89,6 +89,8 @@ Secure Deployer 在 AI 应用和你的服务器之间架起桥梁。轻量级 **
 
 ## 快速开始
 
+**前置要求：** 远程服务器（Agent）和本地电脑（Client）都需要 Node.js **18 或更高版本**。用 `node --version` 检查。版本过低请去 [nodejs.org](https://nodejs.org/) 安装最新 LTS，或使用 `nvm` 管理。
+
 ### 1. 在远程服务器上安装 Agent
 
 ```bash
