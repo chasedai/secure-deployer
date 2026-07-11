@@ -8,6 +8,9 @@ import TerminalPage from "./pages/Terminal";
 import FileManager from "./pages/FileManager";
 import HistoryPage from "./pages/History";
 import SettingsPage from "./pages/Settings";
+import AIConfigPage from "./pages/AIConfig";
+import AIChatPage from "./pages/AIChat";
+import SecurityScanPage from "./pages/SecurityScan";
 import SkillGen from "./pages/SkillGen";
 import ServerManage from "./pages/ServerManage";
 import { authCheck, getPendingTasks, getUnreadAlertCount, connectSSE, type Task } from "./lib/api";
@@ -52,6 +55,9 @@ function AuthenticatedApp() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/skill" element={<SkillGen />} />
         <Route path="/servers" element={<ServerManage />} />
+        <Route path="/ai-chat" element={<AIChatPage />} />
+        <Route path="/scan" element={<SecurityScanPage />} />
+        <Route path="/ai-config" element={<AIConfigPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

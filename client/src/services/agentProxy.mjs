@@ -203,3 +203,19 @@ export function filesDelete(serverId, path, description) {
 export function filesDownloadRaw(serverId, path) {
   return apiRequestRaw(serverId, `/files/download?path=${encodeURIComponent(path)}`);
 }
+
+export function execCommand(serverId, { cmd, description, cwd, timeout, env }) {
+  return apiRequest(serverId, "/exec", {
+    method: "POST",
+    body: { cmd, description, cwd, timeout, env },
+    timeout: 15_000,
+  });
+}
+
+export function getTask(serverId, taskId) {
+  return apiRequest(serverId, `/tasks/${taskId}`);
+}
+
+export function getSystemInfoAI(serverId) {
+  return apiRequest(serverId, "/system");
+}

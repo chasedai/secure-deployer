@@ -6,10 +6,19 @@ import { randomBytes, createHash } from "node:crypto";
 const DATA_DIR = join(homedir(), ".secure-deployer");
 const CLIENT_CONFIG_PATH = join(DATA_DIR, "client-config.json");
 
+const DEFAULT_AI_CONFIG = {
+  baseURL: "https://api.openai.com/v1",
+  apiKey: "",
+  model: "gpt-4o-mini",
+  temperature: 0.3,
+  maxTokens: 16000,
+};
+
 const DEFAULT_CONFIG = {
   dashPort: 9877,
   dashPasswordHash: "",
   servers: [],
+  aiConfig: { ...DEFAULT_AI_CONFIG },
 };
 
 let _config = null;
@@ -23,7 +32,11 @@ export function initConfig() {
 
   if (existsSync(CLIENT_CONFIG_PATH)) {
     const stored = JSON.parse(readFileSync(CLIENT_CONFIG_PATH, "utf-8"));
-    _config = { ...DEFAULT_CONFIG, ...stored };
+    _config = {
+      ...DEFAULT_CONFIG,
+      ...stored,
+      aiConfig: { ...DEFAULT_AI_CONFIG, ...(stored.aiConfig || {}) },
+    };
   } else {
     _config = { ...DEFAULT_CONFIG };
     saveConfig();
@@ -100,4 +113,21 @@ export function getServers() {
 
 export function getServer(id) {
   return getConfig().servers.find((s) => s.id === id) || null;
+}
+
+export function getAIConfig() {
+  const cfg = getConfig().aiConfig || DEFAULT_AI_CONFIG;
+  return { ...DEFAULT_AI_CONFIG, ...cfg };
+}
+
+export function updateAIConfig(patch) {
+  const current = getAIConfig();
+  const next = { ...current, ...patch };
+  updateConfig({ aiConfig: next });
+  return next;
+}
+
+export function isAIConfigured() {
+  const cfg = getAIConfig();
+  return Boolean(cfg.apiKey && cfg.baseURL && cfg.model);
 }

@@ -1,11 +1,13 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, ShieldCheck, Terminal, FolderOpen, History, Settings, FileText, Globe, AlertTriangle, Server, ChevronDown } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, Terminal, FolderOpen, History, Settings, FileText, Globe, AlertTriangle, Server, ChevronDown, Sparkles, MessageSquare, ShieldAlert } from "lucide-react";
 import { useI18n } from "../lib/i18n";
 import { useServer } from "../lib/serverContext";
 import { useState, useRef, useEffect } from "react";
 
 const navKeys = [
   { to: "/", icon: LayoutDashboard, key: "nav.overview" },
+  { to: "/ai-chat", icon: MessageSquare, key: "nav.aiChat" },
+  { to: "/scan", icon: ShieldAlert, key: "nav.scan" },
   { to: "/approval", icon: ShieldCheck, key: "nav.approval" },
   { to: "/terminal", icon: Terminal, key: "nav.terminal" },
   { to: "/files", icon: FolderOpen, key: "nav.files" },
@@ -13,6 +15,7 @@ const navKeys = [
   { to: "/settings", icon: Settings, key: "nav.settings" },
   { to: "/skill", icon: FileText, key: "nav.skill" },
   { to: "/servers", icon: Server, key: "nav.servers" },
+  { to: "/ai-config", icon: Sparkles, key: "nav.aiConfig" },
 ];
 
 export default function Layout({ pendingCount, alertCount }: { pendingCount: number; alertCount: number }) {

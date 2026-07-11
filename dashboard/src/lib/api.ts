@@ -72,6 +72,31 @@ export function connectSSE(sid: string, onEvent: (event: string, data: unknown) 
 // Skill generation (local)
 export const generateSkill = (serverId: string, lang = "zh", extraNotes = "") => request<{ markdown: string }>("/skill/generate", { method: "POST", body: JSON.stringify({ serverId, lang, extraNotes }) });
 
+// AI Config (client-level, not per-server)
+export interface AIConfig { baseURL: string; apiKey: string; model: string; temperature: number; maxTokens: number; apiKeySet?: boolean; }
+export const getAIConfig = () => request<{ config: AIConfig; configured: boolean }>("/ai-config");
+export const updateAIConfig = (data: Partial<AIConfig>) => request<{ config: AIConfig; configured: boolean }>("/ai-config", { method: "POST", body: JSON.stringify(data) });
+export const testAIConfig = () => request<{ ok: boolean; model?: string; message?: string; error?: string }>("/ai-config/test", { method: "POST" });
+
+// Security Scan (per-server)
+export interface ScanFinding { id: string; text: string; solution: string; url: string; }
+export interface ScanResult {
+  scanId: string; serverId: string; startedAt: number; finishedAt?: number; durationMs?: number;
+  tool: string; status: "completed" | "failed" | "running";
+  hardeningIndex?: number | null; testsExecuted?: number;
+  warnings?: ScanFinding[]; suggestions?: ScanFinding[]; error?: string; rawLog?: string;
+}
+export interface RunningScan { scanId: string; status: string; step: string; progress: number; error?: string; startedAt: number; finishedAt?: number; }
+export const getScan = (sid: string) => request<{ latest: ScanResult | null; running: RunningScan | null }>(`/servers/${sid}/scan`);
+export const startScan = (sid: string) => request<{ ok: boolean; running: RunningScan | null }>(`/servers/${sid}/scan/start`, { method: "POST" });
+
+// AI Chat (per-server)
+export interface ChatToolCall { id: string; name: string; args: Record<string, unknown>; result: Record<string, unknown> | null; }
+export interface ChatMessage { id: string; role: "user" | "assistant"; content: string; timestamp: number; toolCalls?: ChatToolCall[]; error?: boolean; reasoningContent?: string; reasoningDurationMs?: number; streaming?: boolean; reasoningStreaming?: boolean; }
+export const getChatHistory = (sid: string) => request<{ messages: ChatMessage[]; autoApprove: boolean }>(`/servers/${sid}/chat`);
+export const clearChatHistory = (sid: string) => request<{ ok: boolean }>(`/servers/${sid}/chat`, { method: "DELETE" });
+export const setChatAutoApprove = (sid: string, enabled: boolean) => request<{ autoApprove: boolean }>(`/servers/${sid}/chat/auto-approve`, { method: "POST", body: JSON.stringify({ enabled }) });
+
 // Types
 export interface Server {
   id: string;

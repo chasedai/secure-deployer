@@ -79,3 +79,38 @@ code, pre {
 .terminal-input::placeholder {
   color: #555 !important;
 }
+
+.markdown-content p { margin: 0.25rem 0; }
+.markdown-content p + p { margin-top: 0.5rem; }
+.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
+  margin: 0.75rem 0 0.35rem; font-weight: 600; color: var(--text-primary);
+}
+.markdown-content h1 { font-size: 1.05rem; }
+.markdown-content h2 { font-size: 1rem; }
+.markdown-content h3 { font-size: 0.95rem; }
+.markdown-content ul, .markdown-content ol { margin: 0.35rem 0; padding-left: 1.25rem; }
+.markdown-content li { margin: 0.15rem 0; }
+.markdown-content code {
+  background: var(--bg-code); border-radius: 4px; padding: 0.1rem 0.35rem;
+  font-size: 0.82rem; color: #d6336c;
+}
+.markdown-content pre {
+  background: #1a1a1a; color: #e0e0e0; border-radius: 10px;
+  padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; font-size: 0.8rem; line-height: 1.5;
+}
+.markdown-content pre code {
+  background: transparent; color: inherit; padding: 0; font-size: 0.8rem;
+}
+.markdown-content blockquote {
+  border-left: 3px solid var(--border); padding-left: 0.75rem;
+  color: var(--text-secondary); margin: 0.5rem 0;
+}
+.markdown-content a { color: var(--accent); text-decoration: none; }
+.markdown-content a:hover { text-decoration: underline; }
+.markdown-content table {
+  border-collapse: collapse; margin: 0.5rem 0; font-size: 0.85rem;
+}
+.markdown-content th, .markdown-content td {
+  border: 1px solid var(--border-light); padding: 0.3rem 0.6rem;
+}
+.markdown-content th { background: var(--bg-primary); font-weight: 600; }
