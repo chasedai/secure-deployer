@@ -89,7 +89,28 @@ Secure Deployer 在 AI 应用和你的服务器之间架起桥梁。轻量级 **
 
 ## 快速开始
 
-**前置要求：** 远程服务器（Agent）和本地电脑（Client）都需要 Node.js **18 或更高版本**。用 `node --version` 检查。版本过低请去 [nodejs.org](https://nodejs.org/) 安装最新 LTS，或使用 `nvm` 管理。
+**前置要求：** 远程服务器（Agent）和本地电脑（Client）都需要 Node.js **18 或更高版本**（推荐 **20 LTS**）。用 `node --version` 检查。
+
+> **不要用** `sudo apt install npm` / `sudo apt install nodejs` — Ubuntu 系统源里的版本通常过旧，无法运行本项目。
+
+### 用 nvm 安装 Node.js 20 LTS（推荐）
+
+```bash
+# 安装 nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc   # 或: source ~/.nvm/nvm.sh
+
+# 安装并启用 Node.js 20 LTS
+nvm install 20
+nvm use 20
+nvm alias default 20
+
+# 验证
+node --version   # 应显示 v20.x.x
+npm --version
+```
+
+> **注意：** Ubuntu 18.04 及更旧系统可能出现 `GLIBC_2.28 not found`。请使用 **Ubuntu 20.04+**（推荐），或从 [unofficial-builds](https://unofficial-builds.nodejs.org/) 安装基于 glibc 2.17 的构建。
 
 ### 1. 在远程服务器上安装 Agent
 

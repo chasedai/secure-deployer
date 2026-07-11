@@ -89,7 +89,28 @@ All new development happens on `workgroup`. `git clone` pulls this branch by def
 
 ## Quick Start
 
-**Prerequisites:** Node.js **18 or newer** on both the remote server (for Agent) and your local machine (for Client). Check with `node --version`. If older, install the latest LTS from [nodejs.org](https://nodejs.org/) or use `nvm`.
+**Prerequisites:** Node.js **18 or newer** (recommended: **20 LTS**) on both the remote server (for Agent) and your local machine (for Client). Check with `node --version`.
+
+> **Do not use** `sudo apt install npm` / `sudo apt install nodejs` on Ubuntu — the system packages are usually too old and will fail to run this project.
+
+### Install Node.js 20 LTS with nvm (recommended)
+
+```bash
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc   # or: source ~/.nvm/nvm.sh
+
+# Install and use Node.js 20 LTS
+nvm install 20
+nvm use 20
+nvm alias default 20
+
+# Verify
+node --version   # should show v20.x.x
+npm --version
+```
+
+> **Note:** Ubuntu 18.04 and older may hit `GLIBC_2.28 not found` with official Node binaries. Use **Ubuntu 20.04+** (recommended), or install from [unofficial-builds](https://unofficial-builds.nodejs.org/) built against glibc 2.17.
 
 ### 1. Install Agent on each remote server
 
